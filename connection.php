@@ -1,3 +1,4 @@
+
 <?php
 $newConnection = new Connection();
 
@@ -88,12 +89,12 @@ class Connection
         }
     }
     
-    public function searchProduct(){
-        if (isset($_POST['searchbutton'])){
-            $search = $_POST['search'];
-            try{
+    // public function searchProduct(){
+    //     if (isset($_POST['searchbutton'])){
+    //         $search = $_POST['search'];
+    //         try{
                 
-            }
-        }
-    }
+    //         }
+    //     }
+    // }
 }
