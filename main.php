@@ -56,8 +56,8 @@ $newConnection->deleteProduct();
                         data-bs-target="#filterModal">
                         Filter
                     </button>
-                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                    <button class="btn btn-outline-success" type="submit">Search</button>
+                    <input type="search" class="form-control me-2" placeholder="Search" aria-label="Recipient's username" aria-label="Search">
+                    <button class="btn btn-primary" type="submit" name="searchbutton">Search</button>
                 </form>
             </div>
         </div>
@@ -83,7 +83,7 @@ $newConnection->deleteProduct();
                 $result = $stmnt->fetchAll();
                 if ($result) {
                     foreach ($result as $row) {
-                        ?>
+                ?>
                         <tr>
                             <td><?php echo $row->id; ?></td>
                             <td><?php echo $row->prod_name; ?></td>
@@ -91,17 +91,19 @@ $newConnection->deleteProduct();
                             <td><?php echo $row->quan; ?></td>
                             <td><?php echo $row->date; ?></td>
                             <td>
-                                <button type="button" class="btn btn-outline-primary me-4 w-25" data-bs-toggle="modal"
-                                    data-bs-target="#editModal<?= $row->id ?>">
-                                    Edit
-                                </button>
-                                <button type="submit" class="btn btn-outline-danger w-25" name="deletebutton"
-                                    value="<?php echo $row->id; ?>">Delete
-                                </button>
+                                <form action="" method="POST">
+                                    <button type="button" class="btn btn-outline-primary me-4 w-25" data-bs-toggle="modal"
+                                        data-bs-target="#editModal<?= $row->id ?>">
+                                        Edit
+                                    </button>
+                                    <button type="submit" class="btn btn-outline-danger w-25" name="deletebutton"
+                                        value="<?php echo $row->id; ?>">Delete
+                                    </button>
+                                </form>
                             </td>
                             <?php include('modal.php'); ?>
                         </tr>
-                        <?php
+                <?php
                     }
                 }
                 ?>
