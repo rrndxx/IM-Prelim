@@ -41,24 +41,6 @@ class Connection
         }
     }
 
-    public function deleteProduct()
-    {
-        if (isset($_POST['deletebutton'])) {
-            $id = $_POST['deletebutton'];
-            try {
-                $connection = $this->openConnection();
-                $query = "DELETE FROM products WHERE id = :id";
-                $stmnt = $connection->prepare($query);
-                $stmnt->execute(["id" => $id]);
-
-                header("Location: main.php");
-                exit;
-            } catch (PDOException $e) {
-                echo "Error: " . $e->getMessage();
-            }
-        }
-    }
-
     public function editProduct()
     {
         if (isset($_POST['editproduct'])) {
@@ -84,6 +66,33 @@ class Connection
                 exit;
             } catch (PDOException $e) {
                 echo "Error: " . $e->getMessage();
+            }
+        }
+    }
+
+    public function deleteProduct()
+    {
+        if (isset($_POST['deletebutton'])) {
+            $id = $_POST['deletebutton'];
+            try {
+                $connection = $this->openConnection();
+                $query = "DELETE FROM products WHERE id = :id";
+                $stmnt = $connection->prepare($query);
+                $stmnt->execute(["id" => $id]);
+
+                header("Location: main.php");
+                exit;
+            } catch (PDOException $e) {
+                echo "Error: " . $e->getMessage();
+            }
+        }
+    }
+    
+    public function searchProduct(){
+        if (isset($_POST['searchbutton'])){
+            $search = $_POST['search'];
+            try{
+                
             }
         }
     }
