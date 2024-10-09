@@ -4,7 +4,28 @@ require_once('connection.php');
 $newConnection->addProduct();
 $newConnection->editProduct();
 $newConnection->deleteProduct();
+$products = [];
 
+
+
+if (isset($_POST['filterProducts'])) {
+    $selectedCategory = $_POST['selectedCategory'];
+    $startDate = $_POST['startDate'];
+    $endDate = $_POST['endDate'];
+
+    $products = $newConnection->filterProducts($selectedCategory, $startDate, $endDate);
+} elseif (isset($_POST['searchbutton'])) {
+    $products = $newConnection->searchProduct();
+} elseif (isset($_POST['instock'])) {
+    $products = $newConnection->inStock();
+} elseif (isset($_POST['outofstock'])) {
+    $products = $newConnection->outofStock();
+} else {
+    $connection = $newConnection->openConnection();
+    $stmnt = $connection->prepare("SELECT * FROM products");
+    $stmnt->execute();
+    $products = $stmnt->fetchAll();
+}
 ?>
 
 <!DOCTYPE html>
@@ -21,7 +42,7 @@ $newConnection->deleteProduct();
     body {
         margin: 0;
         padding: 20px;
-        background-color: #f8f9fa;
+        background-color: white;
     }
 
     .navbar-brand {
@@ -35,32 +56,41 @@ $newConnection->deleteProduct();
 
 <body>
     <!-- NAVBAR -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
+    <nav class="navbar navbar-expand-lg">
         <div class="container-fluid">
-            <a class="navbar-brand">Gaisano Bogo</a>
-            <button class="navbar-toggler bg-success" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+            <p class="navbar-brand">Gaisano Bogo
+                <button class="navbar-toggler bg-success" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <form class="d-flex ms-auto" method="POST">
                     <button type="button" class="btn btn-success me-2" data-bs-toggle="modal"
                         data-bs-target="#addModal">
                         Add
                     </button>
-                    <button type="button" class="btn btn-warning me-2" data-bs-toggle="modal"
+                    <button type="button" class="btn btn-info me-2" data-bs-toggle="modal"
                         data-bs-target="#filterModal">
                         Filter
                     </button>
-                    <input type="search" class="form-control me-2" placeholder="Search"
-                        aria-label="Recipient's username" aria-label="Search">
+                    <input type="search" class="form-control me-2" placeholder="Input product name" name="search"
+                        required>
                     <button class="btn btn-primary" type="submit" name="searchbutton">Search</button>
+                    <button class="btn btn-warning ms-3" type="button"
+                        onclick="window.location.href='main.php'">Reload</button>
+
                 </form>
             </div>
         </div>
     </nav>
+    <form action="" method="POST">
+        <button class="btn btn-success me-2" type="submit" name="instock">In Stock</button>
+        <button class="btn btn-danger" type="submit" name="outofstock">Out of Stock</button>
+    </form>
+    <hr class="mb-4">
     <!-- TABLE -->
     <div class="table-responsive">
-        <table class="table table-striped table-hover">
+        <table class="table table-hover">
             <thead>
                 <tr>
                     <th>ID</th>
@@ -73,12 +103,8 @@ $newConnection->deleteProduct();
             </thead>
             <tbody>
                 <?php
-                $connection = $newConnection->openConnection();
-                $stmnt = $connection->prepare("SELECT * FROM products");
-                $stmnt->execute();
-                $result = $stmnt->fetchAll();
-                if ($result) {
-                    foreach ($result as $row) {
+                if ($products) {
+                    foreach ($products as $row) {
                         ?>
                         <tr>
                             <td><?php echo $row->id; ?></td>
@@ -97,95 +123,105 @@ $newConnection->deleteProduct();
                                     </button>
                                 </form>
                             </td>
-                            <?php include('modal.php'); ?>
+                            <?php include 'modal.php'; ?>
                         </tr>
                         <?php
                     }
+                } else {
+                    echo '<tr><td colspan="6" class="text-center">No products found.</td></tr>';
                 }
                 ?>
             </tbody>
         </table>
     </div>
-</body>
 
-<!-- ADD MODAL -->
-<div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header bg-success">
-                <h5 class="modal-title" id="exampleModalLabel">ADD PRODUCT</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="container-fluid">
-                    <form method="POST" action="">
-                        <div class="row g-3 mb-3">
-                            <div class="col">
-                                <label for="inputproductname" class="form-label">Product Name</label>
-                                <input type="text" class="form-control" id="inputproductname" name="productname"
-                                    required>
+    <!-- ADD MODAL -->
+    <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-success">
+                    <h5 class="modal-title" id="exampleModalLabel">ADD PRODUCT</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <form method="POST" action="">
+                            <div class="row g-3 mb-3">
+                                <div class="col">
+                                    <label for="inputproductname" class="form-label">Product Name</label>
+                                    <input type="text" class="form-control" id="inputproductname" name="productname"
+                                        required>
+                                </div>
                             </div>
-                        </div>
-                        <div class="row g-3 mb-4">
-                            <div class="col">
-                                <label for="inputState" class="form-label">Category</label>
-                                <select id="inputState" class="form-select" name="category" required>
-                                    <option selected disabled>Choose...</option>
-                                    <option>Vegetable</option>
-                                    <option>Fruit</option>
-                                    <option>Drink</option>
-                                </select>
+                            <div class="row g-3 mb-4">
+                                <div class="col">
+                                    <label for="inputState" class="form-label">Category</label>
+                                    <select id="inputState" class="form-select" name="category" required>
+                                        <option selected disabled>Select Category</option>
+                                        <option value="Vegetables">Vegetables</option>
+                                        <option value="Fruits">Fruits</option>
+                                        <option value="Drinks">Drinks</option>
+                                    </select>
+                                </div>
                             </div>
-                            <div class="col">
-                                <label for="inputquantity" class="form-label">Quantity</label>
-                                <input type="text" class="form-control" id="inputquantity" name="quantity" required>
+                            <div class="row g-3 mb-4">
+                                <div class="col">
+                                    <label for="inputQuantity" class="form-label">Quantity</label>
+                                    <input type="number" class="form-control" id="inputQuantity" name="quantity"
+                                        required>
+                                </div>
+                                <div class="col">
+                                    <label for="inputDate" class="form-label">Purchased Date</label>
+                                    <input type="date" class="form-control" id="inputDate" name="purchasedate" required>
+                                </div>
                             </div>
-                        </div>
-                        <div class="row g-3 mb-4">
-                            <div class="col">
-                                <label for="inputpurchasedate" class="form-label">Date</label>
-                                <input type="date" class="form-control" id="inputpurchasedate" name="purchasedate"
-                                    required>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
                             <button type="submit" class="btn btn-success" name="addproduct">Add Product</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FILTER MODAL -->
+    <div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-info">
+                    <h5 class="modal-title" id="filterModalLabel">Filter Products</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label class="form-label">Choose a Category</label>
+                            <select class="form-select" name="selectedCategory" required>
+                                <option selected disabled>Select Category</option>
+                                <option value="Vegetables">Vegetables</option>
+                                <option value="Fruits">Fruits</option>
+                                <option value="Drinks">Drinks</option>
+                            </select>
                         </div>
+                        <div class="mb-3">
+                            <label class="form-label">Purchased Date Range</label>
+                            <div class="d-flex">
+                                <input type="date" class="form-control me-2" name="startDate">
+                                <input type="date" class="form-control" name="endDate">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-info" name="filterProducts">Filter</button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- FILTER MODAL -->
-<div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header bg-warning">
-                <h5 class="modal-title" id="filterModalLabel">Filter Products</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form method="POST">
-                    <div class="mb-3">
-                        <label class="form-label">Select Filter Type</label>
-                        <select id="filterType" class="form-select" name="filterType" required>
-                            <option value="">Choose...</option>
-                            <option value="category">By Category</option>
-                            <option value="availability">By Availability</option>
-                            <option value="date">By Date Range</option>
-                        </select>
-                    </div>
-                    <button type="submit" class="btn btn-primary ms-auto bg-warning" name="applyFilters">Apply Filters</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
-    crossorigin="anonymous"></script>
+    <!-- Include the Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+
+</body>
 
 </html>
