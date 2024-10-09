@@ -1,4 +1,3 @@
-
 <?php
 $newConnection = new Connection();
 
@@ -88,13 +87,72 @@ class Connection
             }
         }
     }
+
+    public function searchProduct()
+    {
+        if (isset($_POST['searchbutton'])) {
+            $search = $_POST['search'];
+            try {
+                $connection = $this->openConnection();
+                $query = "SELECT * FROM products WHERE prod_name = ?";
+                $stmnt = $connection->prepare($query);
+                $stmnt->execute(["$search"]);
+                return $stmnt->fetchAll();
+            } catch (PDOException $e) {
+                echo "Error: " . $e->getMessage();
+            }
+        }
+        return [];
+    }
+    public function inStock()
+    {
+        if (isset($_POST['instock'])) {
+            try {
+                $connection = $this->openConnection();
+                $query = "SELECT * FROM products WHERE quan > 0";
+                $stmnt = $connection->prepare($query);
+                $stmnt->execute();
+                return $stmnt->fetchAll();
+            } catch (PDOException $e) {
+                echo "Error: " . $e->getMessage();
+            }
+        }
+        return [];
+    }
+
+    public function outofStock()
+    {
+        if (isset($_POST['outofstock'])) {
+            try {
+                $connection = $this->openConnection();
+                $query = "SELECT * FROM products WHERE quan <= 0";
+                $stmnt = $connection->prepare($query);
+                $stmnt->execute();
+                return $stmnt->fetchAll();
+            } catch (PDOException $e) {
+                echo "Error: " . $e->getMessage();
+            }
+        }
+        return [];
+    }
+
+    public function filterProducts($category, $startDate, $endDate) {
+        $connection = $this->openConnection();
+        $query = "SELECT * FROM products WHERE cat = :category";
     
-    // public function searchProduct(){
-    //     if (isset($_POST['searchbutton'])){
-    //         $search = $_POST['search'];
-    //         try{
-                
-    //         }
-    //     }
-    // }
+        if (!empty($startDate) && !empty($endDate)) {
+            $query .= " AND date BETWEEN :startDate AND :endDate";
+        }
+    
+        $stmnt = $connection->prepare($query);
+        $stmnt->bindParam(':category', $category);
+    
+        if (!empty($startDate) && !empty($endDate)) {
+            $stmnt->bindParam(':startDate', $startDate);
+            $stmnt->bindParam(':endDate', $endDate);
+        }
+    
+        $stmnt->execute();
+        return $stmnt->fetchAll();
+    }
 }
