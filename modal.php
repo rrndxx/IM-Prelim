@@ -2,48 +2,45 @@
     aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header bg-success">
-                <h5 class="modal-title" id="exampleModalLabel">EDIT PRODUCT</h5> <!-- Changed title for clarity -->
+            <div class="modal-header bg-primary">
+                <h5 class="modal-title" id="exampleModalLabel">EDIT PRODUCT</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div class="container-fluid">
                     <form method="POST" action="">
-                        <input type="hidden" name="edit_id" value="<?= $row->id ?>">
+                        <input type="hidden" name="edit_id" value="<?php echo $row->id; ?>">
                         <div class="row g-3 mb-3">
                             <div class="col">
-                                <label for="inputproductname<?= $row->id ?>" class="form-label">Product Name</label>
-                                <input type="text" class="form-control" id="inputproductname<?= $row->id ?>"
-                                    name="productname" value="<?= $row->prod_name ?>" required>
+                                <label for="inputproductname" class="form-label">Product Name</label>
+                                <input type="text" class="form-control" id="inputproductname" name="productname"
+                                    value="<?php echo $row->prod_name; ?>" required>
                             </div>
                         </div>
                         <div class="row g-3 mb-4">
                             <div class="col">
-                                <label for="inputState<?= $row->id ?>" class="form-label">Category</label>
-                                <select id="inputState<?= $row->id ?>" class="form-select" name="category" required>
-                                    <option value="Vegetable" <?= $row->cat == 'Vegetable' ? 'selected' : '' ?>>Vegetable
-                                    </option>
-                                    <option value="Fruit" <?= $row->cat == 'Fruit' ? 'selected' : '' ?>>Fruit</option>
-                                    <option value="Drink" <?= $row->cat == 'Drink' ? 'selected' : '' ?>>Drink</option>
+                                <label for="inputState" class="form-label">Category</label>
+                                <select id="inputState" class="form-select" name="category" required>
+                                    <option value="<?php echo $row->cat; ?>" selected disabled><?php echo $row->cat; ?></option>
+                                    <option value="Vegetables">Vegetables</option>
+                                    <option value="Fruits">Fruits</option>
+                                    <option value="Drinks">Drinks</option>
                                 </select>
                             </div>
-                            <div class="col">
-                                <label for="inputquantity<?= $row->id ?>" class="form-label">Quantity</label>
-                                <input type="text" class="form-control" id="inputquantity<?= $row->id ?>"
-                                    name="quantity" value="<?= $row->quan ?>" required>
-                            </div>
                         </div>
                         <div class="row g-3 mb-4">
                             <div class="col">
-                                <label for="inputpurchasedate<?= $row->id ?>" class="form-label">Date</label>
-                                <input type="date" class="form-control" id="inputpurchasedate<?= $row->id ?>"
-                                    name="purchasedate" value="<?= $row->date ?>" required>
+                                <label for="inputQuantity" class="form-label">Quantity</label>
+                                <input type="number" class="form-control" id="inputQuantity" name="quantity"
+                                    value="<?php echo $row->quan; ?>" required>
+                            </div>
+                            <div class="col">
+                                <label for="inputDate" class="form-label">Purchased Date</label>
+                                <input type="date" class="form-control" id="inputDate" name="purchasedate"
+                                    value="<?php echo $row->date; ?>" required>
                             </div>
                         </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-primary" name="editproduct">Edit Product</button>
-                        </div>
+                        <button type="submit" class="btn btn-primary" name="editproduct">Update Product</button>
                     </form>
                 </div>
             </div>
