@@ -15,7 +15,7 @@ class Connection
             $this->con = new PDO($this->server, $this->user, $this->pass, $this->options);
             return $this->con;
         } catch (PDOException $th) {
-            echo "There is a problem in the connection:" . $th->getMessage();
+            echo "There is a problem in the connection: " . $th->getMessage();
         }
     }
 
@@ -23,15 +23,23 @@ class Connection
     {
         if (isset($_POST['addproduct'])) {
             $productname = $_POST['productname'];
-            $category = $_POST['category'];
+            $cat = $_POST['category'];
             $quantity = $_POST['quantity'];
             $purchasedate = $_POST['purchasedate'];
 
             try {
                 $connection = $this->openConnection();
-                $query = "INSERT INTO products (prod_name, cat, quan, date) VALUES (?, ?, ?, ?)";
+
+                $query = "SELECT id FROM categories WHERE catname = ?";
                 $stmnt = $connection->prepare($query);
-                $stmnt->execute([$productname, $category, $quantity, $purchasedate]);
+                $stmnt->execute([$cat]);
+                $category = $stmnt->fetch();
+
+                $catid = $category->id;
+
+                $query = "INSERT INTO products (prod_name, cat_id, cat, quan, date) VALUES (?, ?, ?, ?, ?)";
+                $stmnt = $connection->prepare($query);
+                $stmnt->execute([$productname, $catid, $cat, $quantity, $purchasedate]);
 
                 header("Location: main.php");
                 exit;
@@ -46,18 +54,27 @@ class Connection
         if (isset($_POST['editproduct'])) {
             $id = $_POST['edit_id'];
             $productname = $_POST['productname'];
-            $category = $_POST['category'];
+            $cat = $_POST['category'];
             $quantity = $_POST['quantity'];
             $purchasedate = $_POST['purchasedate'];
 
             try {
                 $connection = $this->openConnection();
-                $query = "UPDATE products SET prod_name= :productname, cat= :category, quan= :quantity, date= :purchasedate WHERE id = :id";
+
+                $query = "SELECT id FROM categories WHERE catname = ?";
+                $stmnt = $connection->prepare($query);
+                $stmnt->execute([$cat]);
+                $category = $stmnt->fetch();
+
+                $catid = $category->id;
+
+                $query = "UPDATE products SET prod_name= :productname, cat_id= :catid, cat= :cat, quan= :quantity, date= :purchasedate WHERE id = :id";
                 $stmnt = $connection->prepare($query);
                 $stmnt->execute([
                     "id" => $id,
                     "productname" => $productname,
-                    "category" => $category,
+                    "catid" => $catid,
+                    "cat" => $cat,
                     "quantity" => $quantity,
                     "purchasedate" => $purchasedate,
                 ]);
@@ -69,6 +86,26 @@ class Connection
             }
         }
     }
+
+    public function addCategory()
+    {
+        if (isset($_POST['addcategory'])) {
+            $catname = $_POST['catname'];
+
+            try {
+                $connection = $this->openConnection();
+                $query = "INSERT INTO categories (catname) VALUES (?)";
+                $stmnt = $connection->prepare($query);
+                $stmnt->execute([$catname]);
+
+                header("Location: main.php");
+                exit;
+            } catch (PDOException $e) {
+                echo "Error: " . $e->getMessage();
+            }
+        }
+    }
+
 
     public function deleteProduct()
     {
@@ -96,7 +133,7 @@ class Connection
                 $connection = $this->openConnection();
                 $query = "SELECT * FROM products WHERE prod_name = ?";
                 $stmnt = $connection->prepare($query);
-                $stmnt->execute(["$search"]);
+                $stmnt->execute([$search]);
                 return $stmnt->fetchAll();
             } catch (PDOException $e) {
                 echo "Error: " . $e->getMessage();
@@ -104,6 +141,7 @@ class Connection
         }
         return [];
     }
+
     public function inStock()
     {
         if (isset($_POST['instock'])) {
@@ -136,23 +174,38 @@ class Connection
         return [];
     }
 
-    public function filterProducts($category, $startDate, $endDate) {
+    public function filterProducts($category, $startDate, $endDate)
+    {
         $connection = $this->openConnection();
-        $query = "SELECT * FROM products WHERE cat = :category";
-    
+        $query = "SELECT * FROM products WHERE cat_id = :category"; // Use cat_id
+
         if (!empty($startDate) && !empty($endDate)) {
             $query .= " AND date BETWEEN :startDate AND :endDate";
         }
-    
+
         $stmnt = $connection->prepare($query);
         $stmnt->bindParam(':category', $category);
-    
+
         if (!empty($startDate) && !empty($endDate)) {
             $stmnt->bindParam(':startDate', $startDate);
             $stmnt->bindParam(':endDate', $endDate);
         }
-    
+
         $stmnt->execute();
         return $stmnt->fetchAll();
+    }
+
+    public function getCategories()
+    {
+        try {
+            $connection = $this->openConnection();
+            $query = "SELECT * FROM categories";
+            $stmnt = $connection->prepare($query);
+            $stmnt->execute();
+            return $stmnt->fetchAll();
+        } catch (PDOException $e) {
+            echo "Error: " . $e->getMessage();
+        }
+        return [];
     }
 }
