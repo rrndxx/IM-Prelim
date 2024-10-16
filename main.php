@@ -4,7 +4,9 @@ require_once('connection.php');
 $newConnection->addProduct();
 $newConnection->editProduct();
 $newConnection->deleteProduct();
+$newConnection->addCategory();
 $products = [];
+$categories = $newConnection->getCategories();
 
 if (isset($_POST['filterProducts'])) {
     $selectedCategory = $_POST['selectedCategory'];
@@ -63,9 +65,10 @@ if (isset($_POST['filterProducts'])) {
                 </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <form class="d-flex ms-auto" method="POST">
+                    <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#addCat">Add Category</button>
                     <button type="button" class="btn btn-success me-2" data-bs-toggle="modal"
                         data-bs-target="#addModal">
-                        Add
+                        Add Product
                     </button>
                     <button type="button" class="btn btn-info me-2" data-bs-toggle="modal"
                         data-bs-target="#filterModal">
@@ -74,17 +77,21 @@ if (isset($_POST['filterProducts'])) {
                     <input type="search" class="form-control me-2" placeholder="Input product name" name="search"
                         required>
                     <button class="btn btn-primary" type="submit" name="searchbutton">Search</button>
-                    <button class="btn btn-warning ms-3" type="button"
-                        onclick="window.location.href='main.php'">Reload</button>
+
                 </form>
             </div>
         </div>
     </nav>
 
-    <form action="" method="POST">
-        <button class="btn btn-success me-2" type="submit" name="instock">In Stock</button>
-        <button class="btn btn-danger" type="submit" name="outofstock">Out of Stock</button>
-    </form>
+    <div class="text-end mt-4">
+        <form action="" method="POST">
+            <button class="btn btn-warning me-2" type="button"
+                onclick="window.location.href='main.php'">All Products</button>
+            <button class="btn btn-success me-2" type="submit" name="instock">In Stock</button>
+            <button class="btn btn-danger" type="submit" name="outofstock">Out of Stock</button>
+        </form>
+    </div>
+
     <hr class="mb-4">
 
     <!-- TABLE -->
@@ -94,6 +101,7 @@ if (isset($_POST['filterProducts'])) {
                 <tr>
                     <th>ID</th>
                     <th>Product Name</th>
+                    <th>Category ID</th>
                     <th>Category</th>
                     <th>Quantity</th>
                     <th>Purchased Date</th>
@@ -101,41 +109,31 @@ if (isset($_POST['filterProducts'])) {
                 </tr>
             </thead>
             <tbody>
-                <?php
-                if ($products) {
-                    foreach ($products as $row) {
-                        ?>
-                        <tr>
-                            <td><?php echo $row->id; ?></td>
-                            <td><?php echo $row->prod_name; ?></td>
-                            <td><?php echo $row->cat; ?></td>
-                            <td><?php echo $row->quan; ?></td>
-                            <td><?php echo $row->date; ?></td>
-                            <td>
-                                <form action="" method="POST">
-                                    <button type="button" class="btn btn-outline-primary me-4 w-25" data-bs-toggle="modal"
-                                        data-bs-target="#editModal<?= $row->id ?>">
-                                        Edit
-                                    </button>
-                                    <button type="submit" class="btn btn-outline-danger w-25" name="deletebutton"
-                                        value="<?php echo $row->id; ?>">Delete
-                                    </button>
-                                </form>
-                            </td>
-                            <?php include 'modal.php'; ?>
-                        </tr>
-                        <?php
-                    }
-                } else {
-                    echo '<tr><td colspan="6" class="text-center">No products found.</td></tr>';
-                }
-                ?>
+                <?php foreach ($products as $product): ?>
+                    <tr>
+                        <th scope="row"><?php echo $product->id; ?></th>
+                        <td><?php echo $product->prod_name; ?></td>
+                        <td><?php echo $product->cat_id; ?></td>
+                        <td><?php echo $product->cat; ?></td>
+                        <td><?php echo $product->quan; ?></td>
+                        <td><?php echo $product->date; ?></td>
+                        <td>
+                            <form method="POST" style="display:inline;">
+                                <button type="button" class="btn btn-outline-primary me-4 w-25" data-bs-toggle="modal"
+                                    data-bs-target="#editModal<?= $product->id ?>">
+                                    Edit
+                                </button>
+                                <button type="submit" class="btn btn-outline-danger w-25" name="deletebutton"
+                                    value="<?php echo $product->id; ?>">Delete
+                                </button>
+                            </form>
+                        </td>
+                        <?php include 'modals.php'; ?>
+                    </tr>
+                <?php endforeach; ?>
             </tbody>
         </table>
     </div>
-
-    <?php include 'addmodal.php'; ?>
-    <?php include 'filtermodal.php'; ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
