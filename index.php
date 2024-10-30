@@ -12,17 +12,16 @@ if (isset($_POST['login'])) {
     $user = $stmnt->fetch();
 
     if ($user) {
-        // Use password_verify for hashed passwords
         if ($user->password === $password) {
             $_SESSION['user'] = $username;
             header('Location: main.php');
-            exit; // Always exit after header redirects
+            exit;
         } else {
-            header('Location: index.php?error=1');
+            header('Location: index.php');
             exit;
         }
     } else {
-        header('Location: index.php?error=1');
+        header('Location: index.php');
         exit;
     }
 }
@@ -30,6 +29,7 @@ if (isset($_POST['login'])) {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -44,10 +44,11 @@ if (isset($_POST['login'])) {
             margin-top: 150px;
             font-family: 'Montserrat', sans-serif;
         }
+
         .container {
-            border-radius: 30px;
             box-shadow: rgba(0, 0, 0, 0.44) 0px 3px 8px;
         }
+
         .modal {
             display: flex;
             justify-content: center;
@@ -61,12 +62,14 @@ if (isset($_POST['login'])) {
             overflow: auto;
             background-color: rgba(0, 0, 0, 0.5);
         }
+
         .modal-content {
             background-color: #fff;
             padding: 20px;
             border: 1px solid #888;
             width: 300px;
         }
+
         .close {
             color: #aaa;
             float: right;
@@ -75,6 +78,7 @@ if (isset($_POST['login'])) {
         }
     </style>
 </head>
+
 <body>
     <div class="container bg-light p-4 text-start" style="height: 350px; width: 400px;">
         <h2 class="mt-4 text-center mb-3">Login</h2>
@@ -92,25 +96,7 @@ if (isset($_POST['login'])) {
             </div>
         </form>
     </div>
-
-    <div id="errorModal" class="modal" style="display:none;">
-        <div class="modal-content">
-            <p>Incorrect username or password. Please try again.</p>
-            <button class="btn btn-danger text-light" onclick="closeModal()">Close</button>
-        </div>
-    </div>
-
-    <script>
-        function closeModal() {
-            document.getElementById('errorModal').style.display = 'none';
-        }
-
-        // Check if there's an error parameter in the URL
-        if (new URLSearchParams(window.location.search).has('error')) {
-            document.getElementById('errorModal').style.display = 'flex';
-        }
-    </script>
-    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 </body>
+
 </html>
