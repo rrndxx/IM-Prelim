@@ -1,5 +1,8 @@
 <?php
 session_start();
+if (!isset($_SESSION['user'])) {
+    header('location: index.php');
+}
 require_once('connection.php');
 
 $newConnection->addProduct();
