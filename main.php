@@ -1,8 +1,8 @@
-
 <?php
 session_start();
-if (!isset($_SESSION['user'])) {
-    header('location: index.php');
+
+if (!isset($_SESSION['admin'])) {
+    header('location: adminlogin.php');
 }
 require_once('connection.php');
 
@@ -11,6 +11,7 @@ $newConnection->editProduct();
 $newConnection->deleteProduct();
 $newConnection->addCategory();
 $products = [];
+$users = [];
 $categories = $newConnection->getCategories();
 
 if (isset($_POST['filterProducts'])) {
@@ -32,10 +33,15 @@ if (isset($_POST['filterProducts'])) {
     $products = $stmnt->fetchAll();
 }
 
+$connection = $newConnection->openConnection();
+$stmnt = $connection->prepare("SELECT * FROM users WHERE role = 'Customer'");
+$stmnt->execute();
+$users = $stmnt->fetchAll();
+
 if (isset($_POST['logout'])) {
     session_start();
     session_destroy();
-    header('location: index.php');
+    header('location: adminlogin.php');
     exit();
 }
 ?>
@@ -71,17 +77,18 @@ if (isset($_POST['logout'])) {
         box-shadow: rgba(0, 0, 0, 0.44) 0px 3px 8px;
     }
 
-    button, .tb, .modal{
+    button,
+    .tb,
+    .modal {
         box-shadow: rgba(0, 0, 0, 0.44) 0px 3px 8px;
     }
-
 </style>
 
 <body>
     <!-- NAVBAR -->
     <nav class="navbar navbar-expand-lg">
         <div class="container-fluid">
-            <p class="navbar-brand"><?php echo "Welcome, " . $_SESSION['user'] . "!"; ?>
+            <p class="navbar-brand"><?php echo "Welcome, " . $_SESSION['admin'] . "!"; ?>
                 <button class="navbar-toggler bg-success" type="button" data-bs-toggle="collapse"
                     data-bs-target="#navbarNav">
                     <span class="navbar-toggler-icon"></span>
@@ -116,7 +123,11 @@ if (isset($_POST['logout'])) {
 
     <hr class="mb-4">
 
-    <!-- TABLE -->
+    <div>
+        <h2>PRODUCTS</h2>
+    </div>
+
+    <!-- PRODUCTS TABLE -->
     <div class="table-responsive">
         <table class="table table-hover" style="color: white;">
             <thead>
@@ -151,6 +162,42 @@ if (isset($_POST['logout'])) {
                             </form>
                         </td>
                         <?php include 'modals.php'; ?>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="mt-4">
+        <h2>USERS</h2>
+    </div>
+
+    <!-- USERS TABLE -->
+    <div class="table-responsive mt-4">
+        <table class="table table-hover" style="color: white;">
+            <thead>
+                <tr>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Address</th>
+                    <th>Birthdate</th>
+                    <th>Gender</th>
+                    <th>Username</th>
+                    <th>Role</th>
+                    <th>Date Joined</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($users as $user): ?>
+                    <tr>
+                        <th scope="row"><?php echo $user->first_name; ?></th>
+                        <td><?php echo $user->last_name; ?></td>
+                        <td><?php echo $user->address; ?></td>
+                        <td><?php echo $user->birthdate; ?></td>
+                        <td><?php echo $user->gender; ?></td>
+                        <td><?php echo $user->username; ?></td>
+                        <td><?php echo $user->role; ?></td>
+                        <td><?php echo $user->date_created; ?></td>
                     </tr>
                 <?php endforeach; ?>
             </tbody>
