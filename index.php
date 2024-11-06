@@ -14,7 +14,7 @@ if (isset($_POST['login'])) {
     if ($user) {
         if ($user->password === $password) {
             $_SESSION['user'] = $user->first_name;
-            header('Location: main.php');
+            header('Location: customerdashboard.php');
             exit;
         }
     }
@@ -53,14 +53,22 @@ if (isset($_POST['login'])) {
             right: 20px;
             z-index: 1000;
         }
+
+        .admin-link {
+            position: absolute;
+            top: 20px;
+            right: 130px;
+            z-index: 1000;
+        }
     </style>
 </head>
 
 <body>
     <a href="register.php" class="register-link btn btn-warning">Register</a>
+    <a href="adminlogin.php" class="admin-link btn btn-primary">Admin</a>
     <div class="d-flex justify-content-center">
         <div class="container bg-light p-4 text-start" style="height: 350px; width: 400px;">
-            <h2 class="mt-4 text-center mb-3">Login</h2>
+            <h3 class="mt-4 text-center mb-3">Customer Login</h3>
             <form action="index.php" method="POST" class="mt-3">
                 <div class="form-group">
                     <label for="username" class="form-label">Username</label>
