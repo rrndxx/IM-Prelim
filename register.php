@@ -10,7 +10,7 @@ if (isset($_POST['register'])) {
     $gender = $_POST['gender'];
     $username = $_POST['username'];
     $password = $_POST['password'];
-    $role = "Customer";
+    $role = "Admin";
     $created = date('Y-m-d H:i:s');
 
     $connection = $newConnection->openConnection();
