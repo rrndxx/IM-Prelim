@@ -34,8 +34,6 @@ if (isset($_POST['register'])) {
         }
     }
 }
-
-
 ?>
 
 <!DOCTYPE html>
@@ -52,17 +50,20 @@ if (isset($_POST['register'])) {
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;400;700&display=swap" rel="stylesheet">
     <style>
         body {
-            background-color: #808D7C;
+            background-color: #F4F6F7;
+            /* Same light background as dashboard */
             margin-top: 50px;
             font-family: 'Montserrat', sans-serif;
         }
 
         .container {
-            box-shadow: rgba(0, 0, 0, 0.44) 0px 3px 8px;
-            border-radius: 20px;
+            box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+            border-radius: 15px;
             max-width: 500px;
             margin: auto;
             padding: 20px;
+            background-color: #fff;
+            /* White background for the container */
         }
 
         .login-link {
@@ -71,13 +72,62 @@ if (isset($_POST['register'])) {
             right: 20px;
             z-index: 1000;
         }
+
+        .navbar-brand {
+            font-size: 30px;
+            color: #ECF0F1;
+            font-weight: 600;
+        }
+
+        /* Registration Form Labels and Inputs */
+        .form-label {
+            color: #2C3E50;
+            /* Darker text for labels */
+            font-weight: 500;
+        }
+
+        .form-control {
+            border-radius: 8px;
+            border: 1px solid #BDC3C7;
+        }
+
+        .btn-warning {
+            background-color: #2C3E50;
+            border-color: #2C3E50;
+            color: white;
+            padding: 10px 20px;
+            font-weight: 500;
+        }
+
+        .btn-warning:hover {
+            background-color: #1A2632;
+            border-color: #1A2632;
+        }
+
+        .text-center {
+            margin-top: 10px;
+        }
+
+        /* Change button styles for the login link */
+        .login-link {
+            background-color: #2C3E50;
+            border-color: #2C3E50;
+            color: #ECF0F1;
+            font-weight: 500;
+            padding: 8px 20px;
+        }
+
+        .login-link:hover {
+            background-color: #1A2632;
+            border-color: #1A2632;
+        }
     </style>
 </head>
 
 <body>
-    <a href="index.php" class="login-link btn btn-success">Login</a>
-    <div class="container bg-light mt-4">
-        <h2 class="text-center mb-4">Register</h2>
+    <a href="index.php" class="login-link btn">Login</a>
+    <div class="container mt-4">
+        <h2 class="text-center mb-4" style="color: #2C3E50;">Register</h2>
         <form action="register.php" method="POST">
             <div class="mb-3">
                 <label for="firstname" class="form-label">First Name</label>

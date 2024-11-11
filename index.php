@@ -7,7 +7,7 @@ if (isset($_POST['login'])) {
     $password = $_POST['password'];
 
     $connection = $newConnection->openConnection();
-    $stmnt = $connection->prepare("SELECT * FROM users WHERE username = ?");
+    $stmnt = $connection->prepare("SELECT * FROM users WHERE username = ? AND role = 'Customer'");
     $stmnt->execute([$username]);
     $user = $stmnt->fetch();
 
@@ -38,57 +38,116 @@ if (isset($_POST['login'])) {
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;400;700&display=swap" rel="stylesheet">
     <style>
         body {
-            background-color: #808D7C;
-            margin-top: 150px;
+            background-color: #F4F6F7;
+            /* Light gray background for consistency */
             font-family: 'Montserrat', sans-serif;
+            padding-bottom: 100px;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         .container {
-            box-shadow: rgba(0, 0, 0, 0.44) 0px 3px 8px;
-            border-radius: 20px;
+            box-shadow: rgba(0, 0, 0, 0.1) 0px 6px 15px;
+            border-radius: 12px;
+            background-color: #fff;
+            width: 400px;
+            padding: 30px;
+        }
+
+        .container h3 {
+            font-size: 28px;
+            color: #2C3E50;
+            /* Midnight blue for heading */
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .form-label {
+            color: #34495E;
+            /* Slightly lighter gray for labels */
+        }
+
+        .form-control {
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 16px;
+            color: #34495E;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .btn-success {
+            background-color: #2C3E50;
+            /* Midnight blue for buttons */
+            border-color: #2C3E50;
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: background-color 0.3s ease-in-out;
+        }
+
+        .btn-success:hover {
+            background-color: #1A2632;
+            /* Darker blue for hover effect */
+            border-color: #1A2632;
         }
 
         .register-link {
+            font-size: 14px;
+            text-align: center;
             position: absolute;
-            top: 20px;
-            right: 20px;
-            z-index: 1000;
+            bottom: 20px;
+            width: 100%;
+            color: #BDC3C7;
         }
 
-        .admin-link {
-            position: absolute;
-            top: 20px;
-            right: 130px;
-            z-index: 1000;
+        .register-link a {
+            color: #2C3E50;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .register-link a:hover {
+            color: #34495E;
         }
     </style>
 </head>
 
 <body>
-    <a href="register.php" class="register-link btn btn-warning">Register</a>
-    <a href="adminlogin.php" class="admin-link btn btn-primary">Admin</a>
-    <div class="d-flex justify-content-center">
-        <div class="container bg-light p-4 text-start" style="height: 350px; width: 400px;">
-            <h3 class="mt-4 text-center mb-3">Customer Login</h3>
-            <form action="index.php" method="POST" class="mt-3">
-                <div class="form-group">
-                    <label for="username" class="form-label">Username</label>
-                    <input type="text" class="form-control" name="username" required>
-                </div>
-                <div class="form-group mt-3">
-                    <label for="password" class="form-label">Password</label>
-                    <input type="password" class="form-control" name="password" required>
-                </div>
-                <div class="text-center mt-3">
-                    <button type="submit" class="btn btn-success mt-4" name="login">Login</button>
-                </div>
-            </form>
-        </div>
+
+    <!-- Customer Login Form -->
+    <div class="container">
+        <h3>Customer Login</h3>
+        <form action="index.php" method="POST">
+            <div class="form-group">
+                <label for="username" class="form-label">Username</label>
+                <input type="text" class="form-control" name="username" required>
+            </div>
+            <div class="form-group">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" class="form-control" name="password" required>
+            </div>
+            <div class="text-center">
+                <button type="submit" class="btn btn-success" name="login">Login</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Register Link (for customer page) -->
+    <div class="register-link">
+        <p>Not a customer? <a href="adminlogin.php">Go to admin page</a> or <a href="register.php" class="text-warning">Sign up</a></p>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
         crossorigin="anonymous"></script>
+
 </body>
 
 </html>
