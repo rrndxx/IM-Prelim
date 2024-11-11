@@ -14,6 +14,7 @@ if (isset($_POST['login'])) {
     if ($user) {
         if ($user->password === $password) {
             $_SESSION['user'] = $user->first_name;
+            $_SESSION['user_id'] = $user->id;
             header('Location: customerdashboard.php');
             exit;
         }

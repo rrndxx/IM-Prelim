@@ -208,4 +208,22 @@ class Connection
         }
         return [];
     }
+
+    public function removeFromCart()
+    {
+        if (isset($_POST['removeFromCart'])) {
+            $id = $_POST['removeFromCart'];
+            try {
+                $connection = $this->openConnection();
+                $query = "DELETE FROM cart WHERE id = :id";
+                $stmnt = $connection->prepare($query);
+                $stmnt->execute(["id" => $id]);
+
+                header("Location: customerdashboard.php");
+                exit;
+            } catch (PDOException $e) {
+                echo "Error: " . $e->getMessage();
+            }
+        }
+    }
 }

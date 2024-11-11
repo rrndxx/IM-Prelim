@@ -112,26 +112,25 @@ if (isset($_POST['logout'])) {
         </div>
     </nav>
 
-    <div class="text-end mt-4">
-        <form action="" method="POST">
-            <button class="btn btn-warning me-2" type="button"
-                onclick="window.location.href='main.php'">All Products</button>
-            <button class="btn btn-success me-2" type="submit" name="instock">In Stock</button>
-            <button class="btn btn-danger" type="submit" name="outofstock">Out of Stock</button>
-        </form>
-    </div>
-
     <hr class="mb-4">
 
-    <div>
-        <h2>PRODUCTS</h2>
-    </div>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-start">PRODUCTS</h2>
+        <div class="text-end">
+            <form action="" method="POST">
+                <button class="btn btn-warning me-2" type="button"
+                    onclick="window.location.href='main.php'">All Products</button>
+                <button class="btn btn-success me-2" type="submit" name="instock">In Stock</button>
+                <button class="btn btn-danger" type="submit" name="outofstock">Out of Stock</button>
+            </form>
+        </div>
+    </div>  
 
     <!-- PRODUCTS TABLE -->
-    <div class="table-responsive">
+    <div class="table-responsive mb-4">
         <table class="table table-hover" style="color: white;">
             <thead>
-                <tr>
+                <tr class="text-center bg-secondary">
                     <th>ID</th>
                     <th>Product Name</th>
                     <th>Category ID</th>
@@ -143,7 +142,7 @@ if (isset($_POST['logout'])) {
             </thead>
             <tbody>
                 <?php foreach ($products as $product): ?>
-                    <tr>
+                    <tr class="text-center">
                         <th scope="row"><?php echo $product->id; ?></th>
                         <td><?php echo $product->prod_name; ?></td>
                         <td><?php echo $product->cat_id; ?></td>
@@ -168,6 +167,8 @@ if (isset($_POST['logout'])) {
         </table>
     </div>
 
+    <hr class="my-4">
+
     <div class="mt-4">
         <h2>USERS</h2>
     </div>
@@ -176,7 +177,7 @@ if (isset($_POST['logout'])) {
     <div class="table-responsive mt-4">
         <table class="table table-hover" style="color: white;">
             <thead>
-                <tr>
+                <tr class="text-center bg-secondary">
                     <th>First Name</th>
                     <th>Last Name</th>
                     <th>Address</th>
@@ -189,7 +190,7 @@ if (isset($_POST['logout'])) {
             </thead>
             <tbody>
                 <?php foreach ($users as $user): ?>
-                    <tr>
+                    <tr class="text-center">
                         <th scope="row"><?php echo $user->first_name; ?></th>
                         <td><?php echo $user->last_name; ?></td>
                         <td><?php echo $user->address; ?></td>
