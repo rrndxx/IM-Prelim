@@ -189,7 +189,7 @@ if (isset($_POST['logout'])) {
     }
 
     .btn-success {
-        background-color: #ECF0F1;
+        background-color: #2C3E50;
         border-color: #ECF0F1;
         transition: background-color 0.3s ease-in-out, border-color 0.3s ease-in-out;
         border-radius: 5px;
@@ -198,7 +198,7 @@ if (isset($_POST['logout'])) {
     }
 
     .btn-success:hover {
-        background-color: #BDC3C7;
+        background-color: #BDC3C7;  
         border-color: #BDC3C7;
     }
 
@@ -368,7 +368,15 @@ if (isset($_POST['logout'])) {
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">
                             <h5 class="card-title"><?php echo $product->prod_name; ?> (<?php echo $product->cat; ?>)</h5>
-                            <p class="card-text mb-0">Stock: <?php echo $product->quan; ?></p>
+                            <p class="card-text mb-0"><b style="color: <?php
+                                                                        if ($product->quan > 50) {
+                                                                            echo 'green';
+                                                                        } elseif ($product->quan > 10) {
+                                                                            echo 'orange';
+                                                                        } else {
+                                                                            echo 'red';
+                                                                        }
+                                                                        ?>">Stock: <?php echo $product->quan; ?></b></p>
                         </div>
                         <form method="POST" class="mt-2">
                             <input type="number" name="quantity" class="form-control mb-2" placeholder="Quantity" required>

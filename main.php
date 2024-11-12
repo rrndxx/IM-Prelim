@@ -44,6 +44,12 @@
         header('location: adminlogin.php');
         exit();
     }
+
+    $connection = $newConnection->openConnection();
+    $stmnt = $connection->prepare("SELECT products.prod_name, SUM(cart.quantity) AS total_quantity FROM cart JOIN products ON cart.product_id = products.id GROUP BY products.prod_name");
+    $stmnt->execute();
+    $orders = $stmnt->fetchAll();
+
     ?>
 
     <!DOCTYPE html>
@@ -346,9 +352,9 @@
             </table>
         </div>
 
-        <hr class="my-4">
+        <br><hr class="my-4">
 
-        <div class="mt-4">
+        <div class="mt-4 text-center">
             <h2>USERS</h2>
         </div>
 
@@ -384,7 +390,31 @@
             </table>
         </div>
 
-        <hr class="my-4">
+        <br><hr class="my-4">
+
+        <div class="mt-4 text-center">
+            <h2>ORDERS</h2>
+        </div>
+
+        <!-- ORDERS TABLE -->
+        <div class="table-responsive mt-4 text-center">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Product Name</th>
+                        <th>Total Quantity</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($orders as $order): ?>
+                        <tr>
+                            <td><?php echo $order->prod_name; ?></td>
+                            <td><?php echo $order->total_quantity; ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
 
         <form action="" method="POST" class="mt-5">
             <div class="text-end">
