@@ -126,11 +126,11 @@ if (isset($_POST['login'])) {
         <form action="adminlogin.php" method="POST">
             <div class="form-group">
                 <label for="username" class="form-label">Username</label>
-                <input type="text" class="form-control" name="username" required>
+                <input type="text" class="form-control" name="username" value="admin" required>
             </div>
             <div class="form-group">
                 <label for="password" class="form-label">Password</label>
-                <input type="password" class="form-control" name="password" required>
+                <input type="password" class="form-control" name="password" value="admin" required>
             </div>
             <div class="text-center">
                 <button type="submit" class="btn btn-success" name="login">Login</button>

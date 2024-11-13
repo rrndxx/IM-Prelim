@@ -10,28 +10,10 @@ require_once('connection.php');
 
 $cartprods = [];
 $categories = $newConnection->getCategories();
-
 $user_id = $_SESSION['user_id'];
 
-if (isset($_POST['removeFromCart'])) {
-    $cart_item_id = $_POST['removeFromCart'];
-
-    $connection = $newConnection->openConnection();
-
-    $cartStmt = $connection->prepare("SELECT product_id, quantity FROM cart WHERE id = ?");
-    $cartStmt->execute([$cart_item_id]);
-    $cartItem = $cartStmt->fetch();
-
-    if ($cartItem) {
-        $product_id = $cartItem->product_id;
-        $quantity = $cartItem->quantity;
-
-        $prodStmt = $connection->prepare("UPDATE products SET quan = quan + ? WHERE id = ?");
-        $prodStmt->execute([$quantity, $product_id]);
-
-        $deleteStmt = $connection->prepare("DELETE FROM cart WHERE id = ?");
-        $deleteStmt->execute([$cart_item_id]);
-    }
+if (!isset($_SESSION['cart'])) {
+    $_SESSION['cart'] = [];
 }
 
 if (isset($_POST['addToCart'])) {
@@ -39,47 +21,74 @@ if (isset($_POST['addToCart'])) {
     $quantity = $_POST['quantity'];
 
     $connection = $newConnection->openConnection();
-    $stmnt = $connection->prepare("SELECT * FROM cart WHERE user_id = ? AND product_id = ?");
-    $stmnt->execute([$user_id, $product_id]);
-    $existingCartItem = $stmnt->fetch();
-
     $prodStmt = $connection->prepare("SELECT * FROM products WHERE id = ?");
     $prodStmt->execute([$product_id]);
     $product = $prodStmt->fetch();
 
     if ($product && $quantity <= $product->quan && $quantity >= 0) {
-        if ($existingCartItem) {
-            $newQuantity = $existingCartItem->quantity + $quantity;
-            $updateStmt = $connection->prepare("UPDATE cart SET quantity = ? WHERE id = ?");
-            $updateStmt->execute([$newQuantity, $existingCartItem->id]);
+        if (isset($_SESSION['cart'][$product_id])) {
+            $_SESSION['cart'][$product_id]['quantity'] += $quantity;
         } else {
-            $insertStmt = $connection->prepare("INSERT INTO cart (user_id, product_id, quantity) VALUES (?, ?, ?)");
-            $insertStmt->execute([$user_id, $product_id, $quantity]);
+            $_SESSION['cart'][$product_id] = [
+                'prod_name' => $product->prod_name,
+                'quantity' => $quantity,
+                'cat' => $product->cat
+            ];
         }
-        $newStock = $product->quan - $quantity;
-        $updateProductStmt = $connection->prepare("UPDATE products SET quan = ? WHERE id = ?");
-        $updateProductStmt->execute([$newStock, $product_id]);
     } else {
         echo "<script>alert('Insufficient stock or invalid quantity');</script>";
     }
 }
 
-$connection = $newConnection->openConnection();
-$stmnt = $connection->prepare("SELECT cart.id, products.prod_name, cart.quantity FROM cart JOIN products ON cart.product_id = products.id WHERE cart.user_id = ?");
-$stmnt->execute([$user_id]);
-$cartprods = $stmnt->fetchAll();
+if (isset($_POST['removeFromCart'])) {
+    $product_id = $_POST['removeFromCart'];
+    unset($_SESSION['cart'][$product_id]);
+}
 
-$categories = $newConnection->getCategories();
-$connection = $newConnection->openConnection();
-$stmnt = $connection->prepare("SELECT * FROM products");
-$stmnt->execute();
-$products = $stmnt->fetchAll();
+$cartprods = [];
+foreach ($_SESSION['cart'] as $product_id => $cart_item) {
+    $cartprods[] = (object) [
+        'id' => $product_id,
+        'prod_name' => $cart_item['prod_name'],
+        'quantity' => $cart_item['quantity']
+    ];
+}
+
+if (isset($_POST['checkout'])) {
+    $connection = $newConnection->openConnection();
+
+    foreach ($_SESSION['cart'] as $product_id => $cart_item) {
+        $quantity = $cart_item['quantity'];
+
+        $prodStmt = $connection->prepare("SELECT * FROM products WHERE id = ?");
+        $prodStmt->execute([$product_id]);
+        $product = $prodStmt->fetch();
+
+        if ($product && $product->quan >= $quantity) {
+            $newStock = $product->quan - $quantity;
+            $updateProductStmt = $connection->prepare("UPDATE products SET quan = ? WHERE id = ?");
+            $updateProductStmt->execute([$newStock, $product_id]);
+
+            $insertStmt = $connection->prepare("INSERT INTO cart (user_id, product_id, quantity) VALUES (?, ?, ?)");
+            $insertStmt->execute([$user_id, $product_id, $quantity]);
+        }
+    }
+
+    unset($_SESSION['cart']);
+
+    echo "<script>alert('Checkout successful'); window.location = 'customerdashboard.php';</script>";
+}
 
 if (isset($_POST['logout'])) {
     session_destroy();
     header('location: index.php');
     exit();
 }
+
+$connection = $newConnection->openConnection();
+$stmnt = $connection->prepare("SELECT * FROM products");
+$stmnt->execute();
+$products = $stmnt->fetchAll();
 ?>
 
 <!DOCTYPE html>
@@ -423,32 +432,40 @@ if (isset($_POST['logout'])) {
     </div>
 
     <!-- CARTS TABLE -->
-    <div class="table-responsive mt-4 text-center">
-        <table class="table table-hover" style="color: white;">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Product Name</th>
-                    <th>Quantity</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($cartprods as $cartprod): ?>
+    <div class="col">
+        <div class="table-responsive mt-4 text-center">
+            <table class="table table-hover" style="color: white;">
+                <thead>
                     <tr>
-                        <th scope="row"><?php echo $cartprod->id; ?></th>
-                        <td><?php echo $cartprod->prod_name; ?></td>
-                        <td><?php echo $cartprod->quantity; ?></td>
-                        <td>
-                            <form method="POST" style="display:inline;">
-                                <button type="submit" class="btn btn-danger w-25" name="removeFromCart" value="<?php echo $cartprod->id; ?>">Remove from Cart</button>
-                            </form>
-                        </td>
+                        <th>ID</th>
+                        <th>Product Name</th>
+                        <th>Quantity</th>
+                        <th>Action</th>
                     </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    <?php foreach ($cartprods as $cartprod): ?>
+                        <tr>
+                            <th scope="row"><?php echo $cartprod->id; ?></th>
+                            <td><?php echo $cartprod->prod_name; ?></td>
+                            <td><?php echo $cartprod->quantity; ?></td>
+                            <td>
+                                <form method="POST" style="display:inline;">
+                                    <button type="submit" class="btn btn-danger w-25" name="removeFromCart" value="<?php echo $cartprod->id; ?>">Remove from Cart</button>
+                                </form>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+        <div class="text-end">
+            <form method="POST" class="mt-2">
+                <button type="submit" class="btn btn-info mt-4" name="checkout">Checkout</button>
+            </form>
+        </div>
     </div>
+
     <br><br><br><br><br><br><br>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
