@@ -402,7 +402,7 @@
         <br>
         <hr class="my-4">
 
-        <div class="mt-4 text-center">
+        <div class="mt-4 d-flex justify-content-between">
             <h2>ORDERS</h2>
         </div>
 
