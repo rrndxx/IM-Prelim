@@ -46,7 +46,15 @@
     }
 
     $connection = $newConnection->openConnection();
-    $stmnt = $connection->prepare("SELECT products.prod_name, SUM(cart.quantity) AS total_quantity FROM cart JOIN products ON cart.product_id = products.id GROUP BY products.prod_name");
+    $stmnt = $connection->prepare(
+        "SELECT CONCAT(users.first_name, ' ', users.last_name) AS customer_name, 
+                products.prod_name, 
+                cart.quantity 
+         FROM cart 
+         JOIN products ON cart.product_id = products.id
+         JOIN users ON cart.user_id = users.id 
+         GROUP BY users.first_name, users.last_name, products.prod_name"
+    );
     $stmnt->execute();
     $orders = $stmnt->fetchAll();
 
@@ -352,7 +360,8 @@
             </table>
         </div>
 
-        <br><hr class="my-4">
+        <br>
+        <hr class="my-4">
 
         <div class="mt-4 text-center">
             <h2>USERS</h2>
@@ -390,7 +399,8 @@
             </table>
         </div>
 
-        <br><hr class="my-4">
+        <br>
+        <hr class="my-4">
 
         <div class="mt-4 text-center">
             <h2>ORDERS</h2>
@@ -401,15 +411,17 @@
             <table class="table table-hover">
                 <thead>
                     <tr>
+                        <th>Customer Name</th>
                         <th>Product Name</th>
-                        <th>Total Quantity</th>
+                        <th>Quantity</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php foreach ($orders as $order): ?>
                         <tr>
+                            <td><?php echo $order->customer_name; ?></td>
                             <td><?php echo $order->prod_name; ?></td>
-                            <td><?php echo $order->total_quantity; ?></td>
+                            <td><?php echo $order->quantity; ?></td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
