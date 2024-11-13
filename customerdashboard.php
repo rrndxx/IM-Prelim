@@ -198,7 +198,7 @@ if (isset($_POST['logout'])) {
     }
 
     .btn-success:hover {
-        background-color: #BDC3C7;  
+        background-color: #BDC3C7;
         border-color: #BDC3C7;
     }
 
@@ -261,19 +261,27 @@ if (isset($_POST['logout'])) {
     .card {
         border: none;
         border-radius: 12px;
-        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.2);
+        transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
         margin-bottom: 20px;
+        background-color: #fff;
+        /* Added white background for the cards */
     }
 
     .card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.15);
+        transform: translateY(-10px);
+        box-shadow: 0px 12px 24px rgba(0, 0, 0, 0.3);
+        background-color: #f8f9fa;
+        /* Subtle change to the background color on hover */
     }
 
     .card-img-top {
         border-top-left-radius: 12px;
         border-top-right-radius: 12px;
+        height: 200px;
+        /* Consistent image height */
+        object-fit: cover;
+        /* Ensures the image maintains its aspect ratio */
     }
 
     .card-body {
@@ -281,13 +289,15 @@ if (isset($_POST['logout'])) {
     }
 
     .card-title {
-        font-size: 1.2rem;
-        font-weight: bold;
+        font-size: 1.3rem;
+        font-weight: 600;
         color: #2C3E50;
+        margin-bottom: 10px;
     }
 
     .card-text {
         color: #7F8C8D;
+        margin-bottom: 15px;
     }
 
     .card-footer {
@@ -295,11 +305,28 @@ if (isset($_POST['logout'])) {
         border: none;
     }
 
-    .btn-block {
-        width: 100%;
+    /* Add hover effect to the buttons inside the cards */
+    .card .btn-success {
+        background-color: #27ae60;
+        border-color: #27ae60;
+        transition: background-color 0.3s ease-in-out, border-color 0.3s ease-in-out;
+        border-radius: 5px;
+        padding: 10px 20px;
+        font-weight: 500;
     }
 
-    /* Flex layout for cards */
+    .card .btn-success:hover {
+        background-color: #2ecc71;
+        border-color: #2ecc71;
+    }
+
+    /* Box shadow effect for the product title and stock */
+    .card-body .d-flex {
+        box-shadow: rgba(0, 0, 0, 0.1) 0px 3px 8px;
+        border-radius: 8px;
+        padding: 10px;
+    }
+
     .card-columns {
         display: flex;
         flex-wrap: wrap;
@@ -309,7 +336,6 @@ if (isset($_POST['logout'])) {
 
     .card-columns .col-md-4 {
         flex: 1 1 calc(33.333% - 15px);
-        /* 3 cards per row with spacing */
         max-width: calc(33.333% - 15px);
     }
 
@@ -317,11 +343,10 @@ if (isset($_POST['logout'])) {
         width: 100%;
     }
 
-    /* Mobile responsive layout */
+    /* Responsive design */
     @media (max-width: 768px) {
         .card-columns .col-md-4 {
             flex: 1 1 calc(50% - 15px);
-            /* 2 cards per row on small screens */
             max-width: calc(50% - 15px);
         }
     }
@@ -329,7 +354,6 @@ if (isset($_POST['logout'])) {
     @media (max-width: 576px) {
         .card-columns .col-md-4 {
             flex: 1 1 100%;
-            /* 1 card per row on extra small screens */
             max-width: 100%;
         }
     }
@@ -364,7 +388,7 @@ if (isset($_POST['logout'])) {
         <?php foreach ($products as $product): ?>
             <div class="col-md-4 mb-4">
                 <div class="card">
-                    <!-- <img src="product_images/<?php echo $product->prod_image ?>" class="card-img-top" alt="Product Image"> -->
+                    <img src="https://e0.pxfuel.com/wallpapers/92/249/desktop-wallpaper-best-funny-dog-crazy-dog-thumbnail.jpg" class="card-img-top" alt="Product Image" style="height: 200px; object-fit: cover;">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">
                             <h5 class="card-title"><?php echo $product->prod_name; ?> (<?php echo $product->cat; ?>)</h5>
@@ -379,11 +403,14 @@ if (isset($_POST['logout'])) {
                                                                         ?>">Stock: <?php echo $product->quan; ?></b></p>
                         </div>
                         <form method="POST" class="mt-2">
-                            <input type="number" name="quantity" class="form-control mb-2" placeholder="Quantity" required>
+                            <div class="input-group mb-2">
+                                <input type="number" name="quantity" class="form-control" placeholder="Quantity" required>
+                            </div>
                             <input type="hidden" name="product_id" value="<?php echo $product->id; ?>">
-                            <button type="submit" class="btn btn-success btn-block" name="addToCart">Add to Cart</button>
+                            <button type="submit" class="btn btn-success w-100" name="addToCart">Add to Cart</button>
                         </form>
                     </div>
+
                 </div>
             </div>
         <?php endforeach; ?>
